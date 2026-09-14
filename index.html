@@ -116,6 +116,22 @@
 
   .topbar-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
+  /* Mobile hamburger + hidden side menu (only relevant under the 640px breakpoint below) */
+  .mobile-menu-btn{
+    display:none;background:rgba(var(--teal-rgb),0.06);border:1px solid var(--border);color:var(--text);
+    width:38px;height:38px;border-radius:10px;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .mobile-menu-btn svg{width:20px;height:20px;}
+  .mobile-menu-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .mobile-menu-close{
+    display:none;width:34px;height:34px;align-items:center;justify-content:center;
+    background:rgba(var(--teal-rgb),0.08);border:1px solid var(--border);border-radius:9px;
+    color:var(--text);cursor:pointer;position:absolute;top:14px;right:14px;
+  }
+  .mobile-menu-overlay{display:none;position:fixed;inset:0;background:rgba(3,8,15,0.6);z-index:499;}
+  .mobile-menu-overlay.open{display:block;}
+
   /* Small segmented controls (language, view tabs, strategy toggle) need their inactive
      label to stay readable no matter how transparent the surrounding widgets are, so their
      own pill background stays fixed-opacity instead of following --panel-2's alpha. */
@@ -588,8 +604,25 @@
     input, select, textarea{ font-size:16px; }
     body{padding:16px 12px 40px;}
     .sticky-header{left:12px;right:12px;padding-top:16px;}
-    .topbar{flex-direction:column;align-items:stretch;padding:14px 16px;gap:12px;}
-    .topbar-controls{justify-content:flex-start;}
+    .topbar{flex-direction:row;align-items:center;justify-content:space-between;padding:14px 16px;gap:12px;flex-wrap:nowrap;}
+    .mobile-menu-btn{display:flex;}
+    .topbar-controls{
+      position:fixed;top:0;right:-100%;height:100%;width:min(300px,82vw);
+      background:var(--panel-solid);border-left:1px solid var(--border);border-radius:0;
+      flex-direction:column;align-items:stretch;justify-content:flex-start;flex-wrap:nowrap;
+      margin:0;padding:64px 18px 24px;overflow-y:auto;z-index:500;gap:12px;
+      transition:right .3s ease;box-shadow:-14px 0 34px -10px rgba(0,0,0,0.6);
+    }
+    .topbar-controls.df-menu-open{right:0;}
+    .topbar-controls .info-wrap{width:100%;justify-content:space-between;}
+    .topbar-controls .exportbtn{width:100%;justify-content:flex-start;}
+    .topbar-controls .currency-select,
+    .topbar-controls .settings-select,
+    .topbar-controls .lang-toggle,
+    .topbar-controls .df-plan-wrap{width:100%;}
+    .topbar-controls .currency-btn{width:100%;justify-content:space-between;}
+    .topbar-controls .save-status{width:100%;}
+    .mobile-menu-close{display:flex;}
     .brand{justify-content:flex-start;}
     .panel{padding:16px;}
     .hero{padding:22px 16px;}
@@ -773,6 +806,7 @@
 </style>
 </head>
 <body>
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 <div id="bgImagesLayer" aria-hidden="true" style="grid-template-columns: repeat(1, 1fr);"><div class="bg-tile" style="background-image: url(&quot;image/familidemo.png&quot;);"></div></div>
 <div id="bgColorLayer" aria-hidden="true"></div>
 <script type="application/json" id="appStateData">{"debts":[{"id":1,"name":"Chase Freedom Card","balance":3874,"originalBalance":4200,"rate":22.5,"minPayment":126,"months":6,"example":false,"dueDay":10,"hasMin":true,"priority":2,"snapshotDate":"2026-09-14T19:02:00.795Z","snapshotBalance":1000},{"id":2,"name":"Student Loan – Navient","balance":12440,"originalBalance":12800,"rate":5.8,"minPayment":180,"months":24,"example":false,"dueDay":1,"hasMin":true,"priority":1,"snapshotDate":"2026-09-14T19:03:05.362Z","snapshotBalance":1000},{"id":3,"name":"Toyota Auto Loan","balance":8590,"originalBalance":8900,"rate":7.2,"minPayment":310,"months":12,"example":false,"dueDay":null,"hasMin":true,"priority":2,"snapshotDate":"2026-09-14T19:05:50.839Z","snapshotBalance":1000},{"id":4,"name":"Best Buy Store Card","balance":735,"originalBalance":950,"rate":28.9,"minPayment":65,"months":12,"example":false,"dueDay":3,"hasMin":true,"priority":3,"snapshotDate":"2026-09-14T19:06:35.726Z","snapshotBalance":1000}],"nextId":5,"strategy":"avalanche","history":[{"dateObj":"2026-09-14T19:10:26.343Z","type":"specific","debtId":2,"debtName":"Student Loan – Navient","amount":180,"viaDue":true},{"dateObj":"2026-09-14T19:10:28.334Z","type":"specific","debtId":1,"debtName":"Chase Freedom Card","amount":126,"viaDue":true},{"dateObj":"2026-09-14T19:10:30.726Z","type":"specific","debtId":4,"debtName":"Best Buy Store Card","amount":65,"viaDue":true},{"dateObj":"2026-09-14T19:10:50.993Z","type":"specific","debtId":1,"debtName":"Chase Freedom Card","amount":200},{"dateObj":"2026-09-14T19:11:03.396Z","type":"specific","debtId":2,"debtName":"Student Loan – Navient","amount":180},{"dateObj":"2026-09-14T19:11:32.708Z","type":"specific","debtId":3,"debtName":"Toyota Auto Loan","amount":310},{"dateObj":"2026-09-14T19:11:46.104Z","type":"specific","debtId":4,"debtName":"Best Buy Store Card","amount":150}],"debtTrend":[26670,26544,26479,26279,26099,25789,25639],"duePayments":[{"id":1,"debtId":1,"period":"2026-08","dueDate":"2026-08-10T04:00:00.000Z","status":"paid","paidAt":"2026-09-14T19:10:28.334Z","historyId":1},{"id":2,"debtId":1,"period":"2026-09","dueDate":"2026-09-10T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":3,"debtId":1,"period":"2026-10","dueDate":"2026-10-10T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":4,"debtId":1,"period":"2026-11","dueDate":"2026-11-10T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":5,"debtId":2,"period":"2026-08","dueDate":"2026-08-01T04:00:00.000Z","status":"paid","paidAt":"2026-09-14T19:10:26.343Z","historyId":0},{"id":6,"debtId":2,"period":"2026-09","dueDate":"2026-09-01T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":7,"debtId":2,"period":"2026-10","dueDate":"2026-10-01T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":8,"debtId":2,"period":"2026-11","dueDate":"2026-11-01T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":9,"debtId":4,"period":"2026-08","dueDate":"2026-08-03T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":10,"debtId":4,"period":"2026-09","dueDate":"2026-09-03T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":11,"debtId":4,"period":"2026-10","dueDate":"2026-10-03T04:00:00.000Z","status":"pending","paidAt":null,"historyId":null},{"id":12,"debtId":4,"period":"2026-11","dueDate":"2026-11-03T04:00:00.000Z","status":"paid","paidAt":"2026-09-14T19:10:30.726Z","historyId":2}],"notifRules":[{"id":1,"color":"green","preset":"custom","scope":"all","debtIds":[],"enabled":true,"custom":{"title":"On track this month","msg":"All your minimum payments are covered and you're ahead of schedule."}},{"id":2,"color":"yellow","preset":"multiple_due_this_week","scope":"all","debtIds":[],"enabled":true},{"id":3,"color":"red","preset":"no_recent_payment","scope":"multiple","debtIds":[1],"enabled":true}],"nextRuleId":4,"nextDueId":13,"LANG":"en","CURRENCY":"USD","monthlyIncome":3500,"savingsPct":20,"dueFilter":"all","plannerCollapsed":false}</script>
@@ -789,7 +823,13 @@
         <div class="brand-sub" data-i18n="brandSub">Debt calculator &amp; tracker</div>
       </div>
     </div>
-    <div class="topbar-controls">
+    <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="topbarControls">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+    </button>
+    <div class="topbar-controls" id="topbarControls">
+      <button type="button" class="mobile-menu-close" id="mobileMenuCloseBtn" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
       <div class="info-wrap">
         <div class="save-status" id="saveStatus">
           <span class="save-indicator">
@@ -5265,8 +5305,51 @@
   window.addEventListener("scroll", hideInfoCard, true);
   window.addEventListener("resize", hideInfoCard);
 
+  /* ---------------- mobile side menu ---------------- */
+  function wireMobileMenu(){
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const mobileMenuCloseBtn = document.getElementById("mobileMenuCloseBtn");
+    const topbarControls = document.getElementById("topbarControls");
+    const overlay = document.getElementById("mobileMenuOverlay");
+    if(!mobileMenuBtn || !topbarControls || !overlay) return;
+
+    const originalParent = topbarControls.parentNode;
+    const originalNextSibling = topbarControls.nextSibling;
+    let closeTimer = null;
+
+    function openMenu(){
+      if(closeTimer){ clearTimeout(closeTimer); closeTimer = null; }
+      document.body.appendChild(topbarControls);
+      requestAnimationFrame(()=>{ topbarControls.classList.add("df-menu-open"); });
+      overlay.classList.add("open");
+      mobileMenuBtn.setAttribute("aria-expanded","true");
+      document.body.style.overflow = "hidden";
+    }
+    function closeMenu(){
+      topbarControls.classList.remove("df-menu-open");
+      overlay.classList.remove("open");
+      mobileMenuBtn.setAttribute("aria-expanded","false");
+      document.body.style.overflow = "";
+      closeTimer = setTimeout(()=>{
+        if(originalNextSibling){ originalParent.insertBefore(topbarControls, originalNextSibling); }
+        else{ originalParent.appendChild(topbarControls); }
+        closeTimer = null;
+      }, 320);
+    }
+
+    mobileMenuBtn.addEventListener("click", ()=>{
+      if(topbarControls.classList.contains("df-menu-open")) closeMenu(); else openMenu();
+    });
+    mobileMenuCloseBtn.addEventListener("click", closeMenu);
+    overlay.addEventListener("click", closeMenu);
+    window.addEventListener("resize", ()=>{
+      if(window.innerWidth > 640 && topbarControls.classList.contains("df-menu-open")) closeMenu();
+    });
+  }
+
   /* ---------------- init ---------------- */
   initTheme();
+  wireMobileMenu();
   const restored = loadState();
   applyStaticTranslations();
   document.getElementById("langEsBtn").classList.toggle("active", LANG==="es");
